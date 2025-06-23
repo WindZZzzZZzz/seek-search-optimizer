@@ -1,4 +1,4 @@
-name: Deploy Privacy Policy
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -9,20 +9,30 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v4
 
-      - name: Upload HTML to GitHub Pages
-        uses: actions/upload-pages-artifact@v2
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: policy  # only deploy contents of ./policy/
+          path: policy  # Deploy only the contents of this folder
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
